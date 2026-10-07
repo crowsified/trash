@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CIS 2103 Java Study Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f5;--card:#fff;--ink:#1b2430;--mut:#5b6677;--ln:#d5dbe4;--ac:#0f766e;--ac2:#b45309;--ok:#15803d;--bad:#b91c1c;--code:#14202e;--cf:#e6edf5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161e;--card:#18212c;--ink:#e6ecf3;--mut:#9aa7b8;--ln:#2a3645;--ac:#2dd4bf;--ac2:#fbbf24;--ok:#4ade80;--bad:#f87171;--code:#0b1118}}
+:root[data-theme="dark"]{--bg:#10161e;--card:#18212c;--ink:#e6ecf3;--mut:#9aa7b8;--ln:#2a3645;--ac:#2dd4bf;--ac2:#fbbf24;--ok:#4ade80;--bad:#f87171;--code:#0b1118}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif}
+header{max-width:900px;margin:0 auto;padding:20px 16px 8px}
+h1{font-size:1.6rem;margin:0}header p{margin:2px 0 12px;color:var(--mut)}
+nav{display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid var(--ln)}
+nav button{border:0;background:none;color:var(--mut);font:600 15px inherit;font-family:inherit;padding:10px 14px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav button.on{color:var(--ac);border-color:var(--ac)}
+main{max-width:900px;margin:0 auto;padding:12px 16px 40px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:16px;margin:12px 0}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+button.b,select{font:inherit;font-size:14px;border:1px solid var(--ln);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button.b:hover{border-color:var(--ac)}button.b.on,button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+:root[data-theme="dark"] button.p,:root[data-theme="dark"] button.b.on{color:#10161e}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--ac2);outline-offset:2px}
+pre{background:var(--code);color:var(--cf);font:13px/1.5 "JetBrains Mono",monospace;padding:12px;border-radius:8px;overflow-x:auto;margin:8px 0}
+code{font-family:"JetBrains Mono",monospace;font-size:.9em;background:var(--bg);padding:1px 5px;border-radius:4px}
+h3{margin:.2em 0 .4em}.mut{color:var(--mut);font-size:14px}
+.opt{display:block;width:100%;text-align:left;margin:6px 0}
+.ok{color:var(--ok)}.no{color:var(--bad)}.opt.ok{border-color:var(--ok)}.opt.no{border-color:var(--bad)}
+textarea{width:100%;min-height:200px;font:13px/1.5 "JetBrains Mono",monospace;background:var(--code);color:var(--cf);border:1px solid var(--ln);border-radius:8px;padding:10px}
+input[type=text]{font:inherit;font-size:14px;background:var(--card);color:var(--ink);border:1px solid var(--ln);border-radius:6px;padding:5px 8px;width:100%;min-width:90px}
+input.ok{border-color:var(--ok)}input.no{border-color:var(--bad)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--ln);padding:5px 8px;text-align:left;font-size:14px}th{background:var(--bg)}
+.side{display:flex;gap:16px;flex-wrap:wrap}.side>nav2{flex:0 0 200px}.side>.card{flex:1 1 380px;margin:0;min-width:0}
+</style></head><body>
+<header><h1>CIS 2103 Java Study Studio</h1><p>Control flows, casting, charAt and arrays. Notes, quiz, coding and tracing.</p>
+<nav id="tabs"><button data-t="notes" class="on">Notes</button><button data-t="quiz">Quiz</button><button data-t="code">Code it</button><button data-t="trace">Trace it</button></nav></header>
+<main>
+<section id="notes" class="on"><div class="side"><div id="nlist" style="flex:0 0 210px"></div><div class="card" id="nbody"></div></div></section>
+<section id="quiz"><div class="card" id="qbox"></div></section>
+<section id="code"><div class="row" id="clist"></div><div class="card" id="cbody"></div></section>
+<section id="trace"><div class="row" id="tlist"></div><div class="card" id="tbody"></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;"),P=s=>`<pre>${esc(s)}</pre>`;
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#tabs button,section").forEach(e=>e.classList.remove("on"));b.classList.add("on");$("#"+b.dataset.t).classList.add("on")});
+function pick(list,items,fn,label){list.innerHTML="";items.forEach((x,i)=>{const b=document.createElement("button");b.className="b";b.textContent=label(x,i);b.onclick=()=>{[...list.children].forEach(c=>c.classList.remove("on"));b.classList.add("on");fn(i)};list.append(b)});list.children[0].click()}
+
+/* NOTES */
+const NOTES=[
+["Ch 6","Decision-making",`<p>Control statements steer the flow of execution based on conditions: <b>if, if-else, nested-if, if-else-if</b>, <b>switch-case</b>, and jump statements (<code>break, continue, return</code>).</p>
+<ul><li><b>if</b>: runs a block only when the condition is true.</li><li><b>if-else</b>: the else block runs when the condition is false.</li><li><b>nested if</b>: an if inside another if or else.</li><li><b>if-else-if ladder</b>: checked top-down; the first true condition runs and the rest are skipped. Many <code>else if</code> are allowed, only one final <code>else</code>.</li></ul>`+P(`int number = 10;
+if (number > 0) {
+    System.out.println("Positive");
+} else if (number < 0) {
+    System.out.println("Negative");
+} else {
+    System.out.println("Zero");
+}`)],
+["Ch 6","Switch-case",`<p>A multiway branch that replaces long if-else chains. Allowed switch types: <code>byte, short, int, char</code> (and wrappers), <code>enum</code> (Java 5), <code>String</code> (Java 7). Case values must match the switch type.</p>
+<ul><li><code>break</code> exits the switch. Without it, execution <b>falls through</b> into the next cases.</li><li>Group cases by leaving out break between them.</li><li><code>default</code> runs when no case matches.</li></ul>`+P(`switch (animal) {
+    case "DOG":
+    case "CAT":
+        System.out.println("Pet"); break;
+    default:
+        System.out.println("Unknown");
+}`)],
+["Ch 6","Jump statements",`<ul><li><b>break</b>: ends the nearest loop or switch; control moves to the statement after it.</li><li><b>continue</b>: skips the rest of the current iteration and goes to the next loop check.</li><li><b>return</b>: leaves the method, with or without a value. It is a reserved word.</li></ul>`+P(`for (int i = 1; i <= 10; i++) {
+    if (i == 6) break;      // prints 1 to 5
+}
+for (int i = 1; i <= 10; i++) {
+    if (i == 6) continue;   // skips only 6
+    System.out.print(i + " ");
+}`)],
+["Ch 6","Loops: for, while, do-while",`<ul><li><b>for</b>: use when the number of repeats is known. Parts: initialization, testing condition, body, update. Entry-controlled (checks first).</li><li><b>while</b>: entry-controlled. Test, run body, update, repeat until false.</li><li><b>do-while</b>: exit-controlled. The body runs <b>at least once</b>, then the condition is checked. Good for menus.</li></ul>`+P(`for (int i = 1; i <= 10; i++) { ... }
+
+int i = 1;
+while (i <= 5) { sum += i; i++; }
+
+int c = 1;
+do { System.out.println("Hello"); c++; } while (c < 6);  // 5 times`)+`<p class="mut">Tracing tip: write the loop variable, the condition result (true/false) and the output for every pass, until the condition turns false.</p>`],
+["Ch 7","Type casting overview",`<p>Type casting is converting one data type into another. Java has two kinds: <b>widening</b> (implicit) and <b>narrowing</b> (explicit).</p>
+<div class="tw"><table><tr><th></th><th>Widening</th><th>Narrowing</th></tr><tr><td>Also called</td><td>Implicit casting</td><td>Explicit casting</td></tr><tr><td>Direction</td><td>Smaller to larger type</td><td>Larger to smaller type</td></tr><tr><td>Automatic?</td><td>Yes</td><td>No, needs a cast operator</td></tr><tr><td>Data loss?</td><td>No, safe</td><td>Possible, unsafe</td></tr><tr><td>Without cast</td><td>Works</td><td>Compile-time error</td></tr></table></div>`+P(`byte -> short -> int -> long -> float -> double
+           char -> int`)+`<p class="mut">The "casting up/down" names are used inconsistently across sources, so rely on implicit vs explicit.</p>`],
+["Ch 7","Widening (implicit) casting",`<p>A lower (smaller) type is converted to a higher (larger) type. Java does it automatically because no data can be lost.</p>
+<p>It happens when: the target type is larger than the source type, and both types are compatible with each other.</p>`+P(`int i = 100;
+long l = i;          // int -> long
+float f = l;         // long -> float
+double d = f;        // float -> double
+double d2 = 5;       // 5.0
+char c = 'A';
+int code = c;        // 65 (char -> int)
+System.out.println(d2 + " " + code);   // 5.0 65`)],
+["Ch 7","Narrowing (explicit) casting",`<p>A bigger type is downsized into a smaller one. It does not happen by itself: without a cast you get a <b>compile-time error</b>. It is unsafe because the smaller type has a smaller range, so data can be lost. You use the <b>cast operator</b> <code>(type)</code>.</p>
+<ul><li>double to int <b>truncates</b> the decimals (it does not round).</li><li>A value too big for the target type overflows and wraps around.</li></ul>`+P(`int bad = 9.7;             // compile error
+int x = (int) 9.7;         // 9 (decimals cut off)
+int y = (int) 7.9;         // 7, not 8
+byte b = (byte) 130;       // -126 (overflow)
+double d = 9.7;
+int z = (int) d + 1;       // 10
+int r = 5 / 2;             // 2 (integer division)
+double q = 5 / 2.0;        // 2.5`)],
+["Ch 7","Parsing vs casting",`<p><b>Casting</b> converts between compatible types (<code>(int) 9.7</code>). <b>Parsing</b> turns a String into a primitive (<code>Integer.parseInt("123")</code>) and throws <code>NumberFormatException</code> when the text is not a valid number.</p>`],
+["Ch 7","String charAt()",`<p><code>s.charAt(index)</code> returns the char at that position. Index starts at 0 and must be from 0 to <code>length() - 1</code>; otherwise <code>StringIndexOutOfBoundsException</code>.</p>`+P(`String s = "banana";
+s.charAt(0);              // 'b'
+s.charAt(s.length() - 1); // 'a'
+int count = 0;
+for (int i = 0; i < s.length(); i++)
+    if (s.charAt(i) == 'a') count++;   // 3`)],
+["Ch 8","Arrays basics",`<ul><li>Stores many values of one type; zero-based; <b>fixed length</b> once created; size from the <code>length</code> property (no parentheses).</li><li>Arrays are objects, allocated on the heap.</li><li>Defaults after <code>new</code>: 0 for numbers, false for boolean, null for references.</li><li>Prefer <code>int[] arr</code> over <code>int arr[]</code>.</li><li>Illegal index gives <code>ArrayIndexOutOfBoundsException</code>.</li></ul>`+P(`int[] a = {10, 20, 30, 40};
+a[1] = 25;
+for (int i = 0; i < a.length; i++)
+    System.out.println(a[i]);`)],
+["Ch 8","Three ways to initialize",`<ul><li><b>Shorthand</b> (only at declaration): <code>int[] a = {1, 2, 3};</code></li><li><b>Explicit new</b> (anywhere): <code>a = new int[]{4, 5, 6};</code></li><li><b>Element by element</b> (size first, then fill): <code>int[] a = new int[3]; a[0] = 7;</code></li></ul>`],
+["Ch 8","Memory and methods",`<ul><li><b>Primitive array</b> holds the actual values in contiguous memory.</li><li><b>Object array</b> holds references; the objects live in the heap. <code>new Student[5]</code> creates 5 empty slots (null), you must create each Student.</li><li><b>Stack</b>: method calls, local variables, references. <b>Heap</b>: objects made with <code>new</code>.</li></ul>`+P(`static int sum(int[] arr) {
+    int t = 0;
+    for (int n : arr) t += n;
+    return t;
+}
+static int[] m1() { return new int[]{1, 2, 3}; }`)]];
+(()=>{let last="";const L=$("#nlist");NOTES.forEach((n,i)=>{if(n[0]!=last){last=n[0];const h=document.createElement("div");h.className="mut";h.style.margin="8px 0 2px";h.textContent={"Ch 6":"Chapter 6: Control flows","Ch 7":"Chapter 7: Casting and charAt","Ch 8":"Chapter 8: Arrays"}[n[0]];L.append(h)}const b=document.createElement("button");b.className="b opt";b.textContent=n[1];b.onclick=()=>{L.querySelectorAll("button").forEach(x=>x.classList.remove("on"));b.classList.add("on");$("#nbody").innerHTML=`<h3>${n[1]}</h3>`+n[2]};L.append(b)});L.querySelector("button").click()})();
+
+/* QUIZ */
+const Q=[
+{t:"mc",q:"Which statement ends the nearest loop or switch immediately?",o:["continue","break","return only","exit"],a:1},
+{t:"mc",q:"Which loop always runs its body at least once?",o:["for","while","do-while","enhanced for"],a:2},
+{t:"mc",q:"Which type can NOT be used as a switch argument?",o:["char","String","int","double"],a:3},
+{t:"mc",q:"What is the value of x after: int x = (int) 9.7;",o:["10","9","9.7","Compile error"],a:1},
+{t:"mc",q:"What is the index of the last character of String s?",o:["s.length()","s.length() - 1","s.length() + 1","s.size()"],a:1},
+{t:"mc",q:"Where are objects created with new stored?",o:["Stack","Heap","Register","Method area only"],a:1},
+{t:"mc",q:"Which is an implicit (widening) conversion?",o:["double to int","int to double","long to byte","float to int"],a:1},
+{t:"mc",q:"After int[] a = new int[5]; what is a[0]?",o:["null","undefined","0","-1"],a:2},
+{t:"tf",q:"In an if-else-if ladder, every true condition runs its block.",a:false,e:"Only the first true one runs; the rest is bypassed."},
+{t:"tf",q:"Without break, a switch case falls through to the next case.",a:true},
+{t:"tf",q:"A for loop is an entry-controlled loop.",a:true},
+{t:"tf",q:"continue ends the whole loop.",a:false,e:"It only skips to the next iteration."},
+{t:"tf",q:"The size of a Java array can be changed after it is created.",a:false},
+{t:"tf",q:"Narrowing casting happens automatically in Java.",a:false,e:"It needs an explicit cast operator."},
+{t:"tf",q:"s.charAt(s.length()) is a valid call.",a:false,e:"Last valid index is length() - 1."},
+{t:"tf",q:"A primitive array stores actual values, an object array stores references.",a:true},
+{t:"id",q:"Keyword that skips the rest of the current loop iteration.",a:["continue"]},
+{t:"id",q:"Loop you choose when the number of repetitions is known.",a:["for","for loop"]},
+{t:"id",q:"String method that returns the character at a given index.",a:["charat","charat()"]},
+{t:"id",q:"Exception thrown by Integer.parseInt(\"abc\").",a:["numberformatexception"]},
+{t:"id",q:"What does (int) 7.9 evaluate to?",a:["7"]},
+{t:"id",q:"Property that gives the number of elements in an array.",a:["length",".length"]},
+{t:"id",q:"Memory area that holds local variables and method calls.",a:["stack"]},
+{t:"id",q:"Another name for narrowing type casting.",a:["explicit","explicit casting","explicit type casting"]}];
+let qs=[],qi=0,sc=0,done=false,mode="all";
+const names={mc:"Multiple choice",tf:"True or false",id:"Identification",all:"All types"};
+function qStart(){const box=$("#qbox");box.innerHTML=`<h3>Knowledge quiz</h3><p class="mut">Pick a question type.</p><div class="row">${Object.keys(names).map(k=>`<button class="b ${k==mode?"on":""}" data-m="${k}">${names[k]}</button>`).join("")}</div><button class="b p" id="go">Start quiz</button>`;
+box.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mode=b.dataset.m;qStart()});$("#go").onclick=()=>{qs=Q.filter(x=>mode=="all"||x.t==mode).sort(()=>Math.random()-.5);qi=0;sc=0;qShow()}}
+function qShow(){const box=$("#qbox");if(qi>=qs.length){box.innerHTML=`<h3>Score: ${sc} / ${qs.length}</h3><p>${sc==qs.length?"Perfect run.":"Review the notes for the ones you missed, then retry."}</p><button class="b p" id="re">Try again</button>`;$("#re").onclick=qStart;return}
+const x=qs[qi];done=false;let h=`<p class="mut">Question ${qi+1} of ${qs.length} (${names[x.t]})</p><h3>${esc(x.q)}</h3><div id="ans">`;
+if(x.t=="mc")h+=x.o.map((o,i)=>`<button class="b opt" data-i="${i}">${esc(o)}</button>`).join("");
+if(x.t=="tf")h+=`<button class="b opt" data-i="1">True</button><button class="b opt" data-i="0">False</button>`;
+if(x.t=="id")h+=`<input type="text" id="idin" placeholder="Type your answer"><div class="row"><button class="b p" id="chk">Check</button></div>`;
+box.innerHTML=h+`</div><div id="fb"></div>`;
+const fin=(r,txt)=>{if(done)return;done=true;if(r)sc++;$("#fb").innerHTML=`<p class="${r?"ok":"no"}"><b>${r?"Correct.":"Not quite."}</b> ${txt||""}</p><button class="b p" id="nx">${qi+1<qs.length?"Next":"See score"}</button>`;$("#nx").onclick=()=>{qi++;qShow()}};
+if(x.t!="id")box.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const v=+b.dataset.i;const ok=x.t=="mc"?v==x.a:!!v==x.a;b.classList.add(ok?"ok":"no");if(x.t=="mc"&&!ok)box.querySelector(`[data-i="${x.a}"]`).classList.add("ok");fin(ok,esc(x.e||(x.t=="mc"?"Answer: "+x.o[x.a]:"")))});
+else{const chk=()=>{const v=$("#idin").value.trim().toLowerCase();fin(x.a.includes(v),"Answer: "+esc(x.a[0]))};$("#chk").onclick=chk;$("#idin").onkeydown=e=>{if(e.key=="Enter")chk()}}}
+qStart();
+
+/* CODE */
+const C=[
+{n:"Snack Shop menu",p:`Menu-driven program for a snack shop. Show: 1 Burger P80, 2 Fries P90, 3 Salad P110, 4 Soda P75, 5 Sandwich P60 (the slide lists Sandwich as the 5th item, but choice 5 must quit). Use Scanner for input 1-5. Use a switch: choices 1-4 print the item name and price; 5 prints "Thank you! Visit again!" and stops; anything else prints "Invalid options, enter again" and asks again.`,k:[["Scanner",/Scanner/],["switch statement",/switch\s*\(/],["case 5 exit",/case\s+5/],["default for invalid",/default\s*:/],["repeats (loop)",/\b(do|while|for)\b/],["invalid message",/Invalid options, enter again/]],s:`import java.util.Scanner;
+public class Shop {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int ch;
+        do {
+            System.out.println("1 Burger 2 Fries 3 Salad 4 Soda 5 Exit");
+            ch = sc.nextInt();
+            switch (ch) {
+                case 1: System.out.println("Burger - P80.00"); break;
+                case 2: System.out.println("Fries - P90.00"); break;
+                case 3: System.out.println("Salad - P110.00"); break;
+                case 4: System.out.println("Soda - P75.00"); break;
+                case 5: System.out.println("Thank you! Visit again!"); break;
+                default: System.out.println("Invalid options, enter again");
+            }
+        } while (ch != 5);
+    }
+}`},
+{n:"Multiplication table",p:`Ask the user for a number with Scanner. Use a for loop to print its multiplication table from 1 to 10, e.g. for 5: "5 x 1 = 5", "5 x 2 = 10", ... "5 x 10 = 50". (The slide sample shows wrong products like 5 x 3 = 10; the correct value is 15.) Then trace i, the condition i <= 10 and the output for each pass.`,k:[["Scanner",/Scanner/],["for loop",/for\s*\(/],["condition i <= 10",/<=\s*10|<\s*11/],["multiplies",/\*/],["prints x and =",/" x "|"x"|" = "/]],s:`Scanner sc = new Scanner(System.in);
+int n = sc.nextInt();
+for (int i = 1; i <= 10; i++) {
+    System.out.println(n + " x " + i + " = " + (n * i));
+}`},
+{n:"Number guessing (do-while)",p:`A secret number is fixed in the program (e.g. 7). Use a do-while loop to ask the user for guesses. Print "Too low" or "Too high" for wrong guesses, and "Correct! You guessed the number." when right, then stop.`,k:[["Scanner",/Scanner/],["do-while",/do\s*\{[\s\S]*\}\s*while/],["Too low",/Too low/],["Too high",/Too high/],["Correct message",/Correct! You guessed the number\./]],s:`Scanner sc = new Scanner(System.in);
+int secret = 7, g;
+do {
+    g = sc.nextInt();
+    if (g < secret) System.out.println("Too low");
+    else if (g > secret) System.out.println("Too high");
+    else System.out.println("Correct! You guessed the number.");
+} while (g != secret);`},
+{n:"Running total until 0",p:`Use a while loop and Scanner to read numbers continuously and keep adding them. Stop only when the user enters 0, then print the total sum of all numbers entered.`,k:[["Scanner",/Scanner/],["while loop",/while\s*\(/],["stops at 0",/!=\s*0|==\s*0/],["running total",/\+=|=\s*\w+\s*\+/],["prints total",/println|print\(/]],s:`Scanner sc = new Scanner(System.in);
+int total = 0;
+int n = sc.nextInt();
+while (n != 0) {
+    total += n;
+    n = sc.nextInt();
+}
+System.out.println("Total: " + total);`},
+{n:"Count a character",p:`Ask the user for a text (use nextLine) and then for a character to look for. Use charAt inside a loop to count how many times that character occurs, and print the count.`,k:[["Scanner",/Scanner/],["nextLine",/nextLine/],["charAt",/charAt\(/],["length()",/length\(\)/],["loop",/\b(for|while)\b/],["counter",/\+\+|\+=\s*1/]],s:`Scanner sc = new Scanner(System.in);
+String text = sc.nextLine();
+char target = sc.nextLine().charAt(0);
+int count = 0;
+for (int i = 0; i < text.length(); i++) {
+    if (text.charAt(i) == target) count++;
+}
+System.out.println(count);`},
+{n:"Array sum and return",p:`Write a method int sum(int[] arr) that returns the sum of all elements, and a method int[] makeArray() that returns {1, 2, 3}. In main, print sum(makeArray()). Do not hardcode the array length in sum.`,k:[["int[] parameter",/int\s*\[\]\s*\w+\s*\)/],["returns int[]",/int\s*\[\]\s+\w+\s*\(/],["uses arr.length",/\.length/],["return statement",/return\s/],["loop",/\bfor\b/]],s:`public static int sum(int[] arr) {
+    int t = 0;
+    for (int i = 0; i < arr.length; i++) t += arr[i];
+    return t;
+}
+public static int[] makeArray() { return new int[]{1, 2, 3}; }
+public static void main(String[] a) {
+    System.out.println(sum(makeArray()));   // 6
+}`}];
+pick($("#clist"),C,i=>{const c=C[i];$("#cbody").innerHTML=`<h3>${c.n}</h3><p>${esc(c.p)}</p><textarea id="src" spellcheck="false" placeholder="Write your Java here"></textarea><div class="row"><button class="b p" id="cc">Check my code</button><button class="b" id="cs">Show model answer</button></div><div id="cr"></div>`;
+$("#cc").onclick=()=>{const v=$("#src").value;$("#cr").innerHTML=`<p class="mut">This is a keyword checklist, not a compiler. Run your code in your IDE to confirm.</p>`+c.k.map(k=>`<div class="${k[1].test(v)?"ok":"no"}">${k[1].test(v)?"&#10003;":"&#10007;"} ${k[0]}</div>`).join("")};
+$("#cs").onclick=()=>{$("#cr").innerHTML="<pre></pre>";$("#cr pre").textContent=c.s}},c=>c.n);
+
+/* TRACE */
+const T=[
+{n:"for loop sum",c:`int sum = 0;
+for (int i = 1; i <= 5; i++) {
+    sum += i;
+}
+System.out.println("Sum = " + sum);`,h:["Pass","i <= 5 ?","sum after body"],r:[["i = 1","true","1"],["i = 2","true","3"],["i = 3","true","6"],["i = 4","true","10"],["i = 5","true","15"],["i = 6","false","-"]],o:"Sum = 15"},
+{n:"do-while",c:`int c = 1;
+do {
+    System.out.println("Hello World");
+    c++;
+} while (c < 6);`,h:["Pass","c after c++","c < 6 ?","Prints"],r:[["1","2","true","Hello World"],["2","3","true","Hello World"],["3","4","true","Hello World"],["4","5","true","Hello World"],["5","6","false","Hello World"]],o:"Hello World (5 lines)",x:"helloworld".repeat(5)},
+{n:"break and continue",c:`for (int i = 1; i <= 10; i++) {
+    if (i == 3) continue;
+    if (i == 6) break;
+    System.out.print(i + " ");
+}`,h:["i","i == 3 ?","i == 6 ?","Printed"],r:[["1","false","false","1"],["2","false","false","2"],["3","true","-","-"],["4","false","false","4"],["5","false","false","5"],["6","false","true","-"]],o:"1 2 4 5",t:"On a continue the second if is not evaluated; write - for steps that do not happen."},
+{n:"switch fall-through",c:`int n = 2;
+switch (n) {
+    case 1: System.out.print("A");
+    case 2: System.out.print("B");
+    case 3: System.out.print("C"); break;
+    case 4: System.out.print("D");
+}`,h:["Label","Its code runs ?","Printed"],r:[["case 1","false","-"],["case 2","true","B"],["case 3","true","C"],["case 4","false","-"]],o:"BC",t:"Case 2 matches, there is no break, so case 3 also runs and then break exits."},
+{n:"charAt count",c:`String s = "banana";
+int count = 0;
+for (int i = 0; i < s.length(); i++) {
+    if (s.charAt(i) == 'a') count++;
+}
+System.out.println(count);`,h:["i","s.charAt(i)","== 'a' ?","count after"],r:[["0","b","false","0"],["1","a","true","1"],["2","n","false","1"],["3","a","true","2"],["4","n","false","2"],["5","a","true","3"]],o:"3"},
+{n:"array maximum",c:`int[] a = {4, 8, 2};
+int max = a[0];
+for (int i = 1; i < a.length; i++) {
+    if (a[i] > max) max = a[i];
+}
+System.out.println(max);`,h:["i","a[i]","a[i] > max ?","max after"],r:[["1","8","true","8"],["2","2","false","8"]],o:"8",t:"max starts at 4. At i = 3 the condition i < 3 is false, so the loop ends."}];
+const nz=v=>{v=v.toLowerCase().replace(/\s/g,"");return{t:"true",yes:"true",f:"false",no:"false","":"-","—":"-","–":"-"}[v]||v};
+pick($("#tlist"),T,i=>{const t=T[i];$("#tbody").innerHTML=`<h3>${t.n}</h3><p class="mut">Fill in each pass. Use true or false for conditions and - for nothing.${t.t?" "+t.t:""}</p><pre></pre><div class="tw"><table><tr>${t.h.map(x=>`<th>${esc(x)}</th>`).join("")}</tr>${t.r.map(r=>`<tr><td>${esc(r[0])}</td>${r.slice(1).map(()=>`<td><input type="text" autocomplete="off"></td>`).join("")}</tr>`).join("")}</table></div><p><b>Final output:</b></p><input type="text" id="fo" autocomplete="off"><div class="row"><button class="b p" id="tc">Check</button><button class="b" id="tr">Reveal answers</button></div><div id="tres"></div>`;
+$("#tbody pre").textContent=t.c;const ins=[...$("#tbody table").querySelectorAll("input")];
+$("#tc").onclick=()=>{let ok=0;ins.forEach((el,k)=>{const w=t.r[Math.floor(k/(t.h.length-1))][k%(t.h.length-1)+1],g=nz(el.value)==nz(w);el.className=g?"ok":"no";ok+=g});const fo=nz($("#fo").value.replace(/\n/g,"")),fx=nz(t.x||t.o),fg=fo==fx;$("#fo").className=fg?"ok":"no";$("#tres").innerHTML=`<p><b>${ok} of ${ins.length} cells correct${fg?", final output correct.":", final output not yet right."}</b></p>`};
+$("#tr").onclick=()=>{ins.forEach((el,k)=>{el.value=t.r[Math.floor(k/(t.h.length-1))][k%(t.h.length-1)+1];el.className=""});$("#fo").value=t.o;$("#fo").className=""}},t=>t.n);
+</script></body></html>
